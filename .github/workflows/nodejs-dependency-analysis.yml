@@ -1,0 +1,40 @@
+name: Analyze Node Dependencies with Snyk
+
+on:
+  workflow_call:
+    inputs:
+      node_version:
+        required: true
+        type: string
+        default: "['20.x']"
+        description: Node.js version to use when setting up. (eg. 20.x, 18.x)
+    secrets:
+      snyk_token:
+        required: true
+        description: Token will be used to run Snyk.
+
+jobs:
+  dependency-analysis:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: ${{ fromJson(inputs.node_version) }}
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+      - run: npm ci
+
+      - name: Run Snyk to check for vulnerabilities
+        uses: snyk/actions/node@master
+        continue-on-error: true # To make sure that SARIF upload gets called
+        env:
+          SNYK_TOKEN: ${{ secrets.snyk_token }}
+        with:
+          args: --severity-threshold=high
+
+    #   - name: Run npm audit
+    #     run: npm audit --audit-level=high
