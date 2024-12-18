@@ -1,0 +1,55 @@
+name: Build & Publish Docker Images
+
+on:
+  workflow_call:
+    inputs:
+      image_name:
+        required: true
+        type: string
+      tag:
+        type: string
+    secrets:
+      registry_username:
+        required: true
+      registry_password:
+        required: true
+
+jobs:
+  image-build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Cache Docker Layers
+        uses: actions/cache@v3
+        with:
+          path: /tmp/.buildx-cache
+          key: ${{ runner.os }}-docker-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-docker-
+
+      - name: Build Docker Image
+        run: docker build -t ${{ secrets.registry_username }}/${{ inputs.image_name }}:latest .
+
+      - name: Scan Docker Image for vulnerabilities with Trivy
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: ${{ secrets.registry_username }}/${{ inputs.image_name }}:latest
+          format: "github"
+          output: "dependency-results.sbom.json"
+          severity: "CRITICAL,HIGH"
+          exit-code: "1"
+
+      - name: Tag Docker image with semantic version and latest
+        run: |
+          docker image ls
+          docker tag ${{ secrets.registry_username }}/${{ inputs.image_name }}:latest ${{ secrets.registry_username }}/${{ inputs.image_name }}:latest
+          docker tag ${{ secrets.registry_username }}/${{ inputs.image_name }}:latest ${{ secrets.registry_username }}/${{ inputs.image_name }}:v${{ inputs.tag }}
+
+      - name: Log in to Docker Hub
+        run: docker login -u ${{ secrets.registry_username }} -p ${{ secrets.registry_password }}
+
+      - name: Push latest Docker image to Docker Hub
+        run: |
+          docker push ${{ secrets.registry_username }}/${{ inputs.image_name }}:v${{ inputs.tag }}
+          docker push ${{ secrets.registry_username }}/${{ inputs.image_name }}:latest
