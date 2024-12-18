@@ -6,7 +6,7 @@ on:
       node_version:
         required: true
         type: string
-        default: 20.x
+        default: "['20.x']"
         description: Node.js version to use when setting up. (eg. 20.x, 18.x)
 
 jobs:
@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: ${{ inputs.node_version }}
+        node-version: ${{ fromJson(inputs.node_version) }}
 
     steps:
       - uses: actions/checkout@v4
