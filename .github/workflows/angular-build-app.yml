@@ -1,0 +1,27 @@
+name: Build Angular App
+
+on:
+  workflow_call:
+    inputs:
+      node_version:
+        required: true
+        type: string
+        default: 20.x
+        description: Node.js version to use when setting up. (eg. 20.x, 18.x)
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: ${{ inputs.node_version }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: "npm"
+      - run: npm ci
+      - run: npm run build
