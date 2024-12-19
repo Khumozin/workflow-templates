@@ -43,8 +43,7 @@ jobs:
       - name: Verify Directory Structure
         run: |
           echo "Current directory: $(pwd)"
-          echo "Project base directory: news-app"
-          ls -R news-app || echo "Directory not found"
+          ls -R /home/runner/work/news-app || echo "Directory not found"
 
       - name: Analyze with SonarCloud
         uses: sonarsource/sonarcloud-github-action@master
