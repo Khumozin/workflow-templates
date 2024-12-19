@@ -1,4 +1,4 @@
-name: Build Angular App
+name: Semantic Release
 
 on:
   workflow_call:
@@ -10,11 +10,15 @@ on:
         description: Node.js version to use when setting up. (eg. 20.x, 18.x)
 
 jobs:
-  build:
+  semantic-release:
     runs-on: ubuntu-latest
     strategy:
       matrix:
         node-version: ${{ fromJson(inputs.node_version) }}
+
+    permissions:
+      contents: write
+
     steps:
       - uses: actions/checkout@v4
 
@@ -22,16 +26,15 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
-          cache: "npm"
 
-      - name: Cache Node Modules
-        uses: actions/cache@v3
+      - name: Install Dependencies
+        run: npm install --global semantic-release@24.2.0 @semantic-release/github@11.0.1
+
+      - name: Semantic Release
+        uses: nick-fields/retry@v2
         with:
-          path: ~/.npm
-          key: ${{ runner.os }}-node-modules-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-modules-
-
-      - run: npm ci
-
-      - run: npm run build
+          timeout_minutes: 5
+          max_attempts: 2
+          command: semantic-release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

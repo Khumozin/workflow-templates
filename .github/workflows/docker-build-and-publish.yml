@@ -40,7 +40,7 @@ jobs:
                        -t ${{ secrets.registry_username }}/${{ inputs.image_name }}:latest .
 
       - name: Scan Docker Image for Vulnerabilities with Trivy
-        uses: aquasecurity/trivy-action@v0.11.0
+        uses: aquasecurity/trivy-action@master
         with:
           image-ref: ${{ secrets.registry_username }}/${{ inputs.image_name }}:latest
           format: "github"
