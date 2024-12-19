@@ -8,6 +8,13 @@ on:
         type: string
         default: "['20.x']"
         description: Node.js version to use when setting up. (eg. 20.x, 18.x)
+    outputs:
+        pkg-version:
+            description: "The current release version"
+            value: ${{ jobs.semantic-release.outputs.pkg-version }}
+        prev-pkg-version:
+                description: "The previous release version"
+                value: ${{ jobs.semantic-release.outputs.prev-pkg-version }}
 
 jobs:
   semantic-release:
@@ -20,8 +27,8 @@ jobs:
       contents: write
 
     outputs:
-      pkg-version: ${{ steps.get-version.outputs.pkg-version }}
-      prev-pkg-version: ${{ steps.get-previous-version.outputs.prev-pkg-version }}
+      pkg-version: ${{ steps.get-version.outputs.pkg-ver }}
+      prev-pkg-version: ${{ steps.get-previous-version.outputs.prev-pkg-ver }}
 
     steps:
       - uses: actions/checkout@v4
@@ -50,7 +57,7 @@ jobs:
         id: get-previous-version
         run: |
           PREV_PKG_VERSION=$(npm pkg get version)
-          echo "prev-pkg-version=$PREV_PKG_VERSION" > $GITHUB_OUTPUT
+          echo "prev-pkg-ver=$PREV_PKG_VERSION" > $GITHUB_OUTPUT
 
       - name: Semantic Release
         uses: nick-fields/retry@v2
@@ -65,4 +72,4 @@ jobs:
         id: get-version
         run: |
           PKG_VERSION=$(npm pkg get version)
-          echo "pkg-version=$PKG_VERSION" > $GITHUB_OUTPUT
+          echo "pkg-ver=$PKG_VERSION" > $GITHUB_OUTPUT
