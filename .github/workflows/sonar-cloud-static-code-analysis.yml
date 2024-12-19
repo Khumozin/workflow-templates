@@ -43,13 +43,13 @@ jobs:
       - name: Verify Directory Structure
         run: |
           echo "Current directory: $(pwd)"
-          echo "Project base directory: ${{ inputs.project_base_directory }}"
-          ls -R ${{ inputs.project_base_directory }} || echo "Directory not found"
+          echo "Project base directory: news-app"
+          ls -R news-app || echo "Directory not found"
 
       - name: Analyze with SonarCloud
         uses: sonarsource/sonarcloud-github-action@master
         with:
-          projectBaseDir: ${{ inputs.project_base_directory }}
+          projectBaseDir: news-app
           args: >
             -Dsonar.organization=${{ secrets.SONAR_CLOUD_ORGANIZATION }}
             -Dsonar.projectKey=${{ secrets.SONAR_CLOUD_PROJECT_KEY }}
@@ -57,3 +57,4 @@ jobs:
             -Dsonar.login=${{ secrets.SONAR_CLOUD_TOKEN }}
             -Dsonar.sources=${{ inputs.source_folder }}
             -Dsonar.verbose=true
+            -X
