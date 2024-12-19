@@ -48,7 +48,7 @@ jobs:
       - name: Analyze with SonarCloud
         uses: sonarsource/sonarcloud-github-action@master
         with:
-          projectBaseDir: news-app
+          projectBaseDir: /home/runner/work/${{ inputs.project_base_directory }}/${{ inputs.project_base_directory }}
           args: >
             -Dsonar.organization=${{ secrets.SONAR_CLOUD_ORGANIZATION }}
             -Dsonar.projectKey=${{ secrets.SONAR_CLOUD_PROJECT_KEY }}
