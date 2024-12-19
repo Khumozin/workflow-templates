@@ -26,6 +26,9 @@ on:
 jobs:
   static-code-analysis:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./${{ inputs.project_base_directory }}
 
     steps:
       - uses: actions/checkout@v4
