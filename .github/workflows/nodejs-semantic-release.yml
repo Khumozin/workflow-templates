@@ -1,0 +1,68 @@
+name: NodeJS Semantic Release
+
+on:
+  workflow_call:
+    inputs:
+      node_version:
+        required: true
+        type: string
+        default: "['20.x']"
+        description: Node.js version to use when setting up. (eg. 20.x, 18.x)
+
+jobs:
+  semantic-release:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: ${{ fromJson(inputs.node_version) }}
+
+    permissions:
+      contents: write
+
+    outputs:
+      pkg-version: ${{ steps.get-version.outputs.pkg-version }}
+      prev-pkg-version: ${{ steps.get-previous-version.outputs.prev-pkg-version }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: "npm"
+
+      - name: Cache Node Modules
+        uses: actions/cache@v3
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-modules-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-modules-
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Build App
+        run: npm run build
+
+      - name: Get Previous Release Version
+        id: get-previous-version
+        run: |
+          PREV_PKG_VERSION=$(npm pkg get version)
+          echo "prev-pkg-version=$PREV_PKG_VERSION" > $GITHUB_OUTPUT
+
+      - name: Semantic Release
+        uses: nick-fields/retry@v2
+        with:
+          timeout_minutes: 5
+          max_attempts: 2
+          command: npx semantic-release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Get Updated Release Version
+        id: get-version
+        run: |
+          PKG_VERSION=$(npm pkg get version)
+          echo "pkg-version=$PKG_VERSION" > $GITHUB_OUTPUT
