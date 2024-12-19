@@ -40,11 +40,6 @@ jobs:
       - name: Setup SonarCloud
         uses: warchant/setup-sonar-scanner@v8
 
-      - name: Verify Directory Structure
-        run: |
-          echo "Current directory: $(pwd)"
-          ls -R /home/runner/work/news-app || echo "Directory not found"
-
       - name: Analyze with SonarCloud
         uses: sonarsource/sonarcloud-github-action@master
         with:
@@ -56,4 +51,3 @@ jobs:
             -Dsonar.login=${{ secrets.SONAR_CLOUD_TOKEN }}
             -Dsonar.sources=${{ inputs.source_folder }}
             -Dsonar.verbose=true
-            -X
