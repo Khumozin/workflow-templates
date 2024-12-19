@@ -9,7 +9,7 @@ on:
         default: "['20.x']"
         description: Node.js version to use when setting up. (eg. 20.x, 18.x)
     secrets:
-      snyk_token:
+      SNYK_TOKEN:
         required: true
         description: Token will be used to run Snyk.
 
@@ -43,7 +43,7 @@ jobs:
         uses: snyk/actions/node@master
         continue-on-error: true # To make sure that SARIF upload gets called
         env:
-          SNYK_TOKEN: ${{ secrets.snyk_token }}
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         with:
           args: --severity-threshold=high
 
