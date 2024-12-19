@@ -1,0 +1,44 @@
+name: Analyze with SonarCloud
+
+on:
+  workflow_call:
+    inputs:
+      project_base_directory:
+        required: true
+        type: string
+        description: This should be the base directory of your project, e.g. projectName
+      source_folder:
+        required: true
+        type: string
+        default: "src/"
+        description: This should be the source folder of your project, e.g. src/
+
+    secrets:
+      SONAR_CLOUD_TOKEN:
+        required: true
+      SONAR_CLOUD_ORGANIZATION:
+        required: true
+      SONAR_CLOUD_URL:
+        required: true
+      SONAR_CLOUD_PROJECT_KEY:
+        required: true
+
+jobs:
+  static-code-analysis:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Setup SonarCloud
+        uses: warchant/setup-sonar-scanner@v8
+
+      - name: Analyze with SonarCloud
+        uses: sonarsource/sonarcloud-github-action@master
+        with:
+          projectBaseDir: ${{ inputs.project_base_directory }}
+          args: >
+            -Dsonar.organization=${{ secrets.SONAR_CLOUD_ORGANIZATION }}
+            -Dsonar.projectKey=${{ secrets.SONAR_CLOUD_PROJECT_KEY }}
+            -Dsonar.host.url=${{ secrets.SONAR_CLOUD_URL }}
+            -Dsonar.login=${{ secrets.SONAR_CLOUD_TOKEN }}
+            -Dsonar.sources=${{ inputs.source_folder }}
+            -Dsonar.verbose=true
