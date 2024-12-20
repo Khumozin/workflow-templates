@@ -52,5 +52,6 @@ jobs:
             -Dsonar.organization=${{ secrets.SONAR_ORGANIZATION }}
             -Dsonar.projectKey=${{ secrets.SONAR_PROJECT_KEY }}
             -Dsonar.host.url=${{ secrets.SONAR_URL }}
+            -Dsonar.branch.name=${{ github.ref_name }}
             -Dsonar.sources=${{ inputs.source_folder }}
             -Dsonar.verbose=true
