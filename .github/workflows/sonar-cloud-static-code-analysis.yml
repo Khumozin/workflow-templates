@@ -18,12 +18,12 @@ on:
         required: true
       SONAR_ORGANIZATION:
         required: true
-        description: This is your github display name, not username.
+        description: Copy this from SonarCloud > Organization > Key
       SONAR_URL:
         required: true
       SONAR_PROJECT_KEY:
         required: true
-        description: This is your github repository name.
+        description: Copy this from SonarCloud > Organization > Project > ProkectKey
 
 jobs:
   static-code-analysis:
