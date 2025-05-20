@@ -75,7 +75,7 @@ jobs:
           push: true
           tags: |
             ${{ secrets.DOCKER_USERNAME }}/${{ inputs.image_name }}:latest
-            ${{ secrets.DOCKER_USERNAME }}/${{ inputs.image_name }}:v${{ fromJson(inputs.tag) }}
+            ${{ secrets.DOCKER_USERNAME }}/${{ inputs.image_name }}:v${{ inputs.tag }}
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache-new
 
