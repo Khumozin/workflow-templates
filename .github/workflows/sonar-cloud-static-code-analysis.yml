@@ -18,12 +18,12 @@ on:
         required: true
       SONAR_ORGANIZATION:
         required: true
-        description: From SonarCloud > Organization > Key
+        description: Copy from SonarCloud > Organization > Key
       SONAR_URL:
         required: true
       SONAR_PROJECT_KEY:
         required: true
-        description: From SonarCloud > Project > Project Key
+        description: Copy from SonarCloud > Project > Project Key
 
 jobs:
   static-code-analysis:
