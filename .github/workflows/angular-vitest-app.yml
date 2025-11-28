@@ -1,4 +1,4 @@
-name: Build Angular App
+name: Unit Test Angular App
 
 on:
   workflow_call:
@@ -10,11 +10,12 @@ on:
         description: Node.js version to use when setting up. (eg. 20.x, 18.x)
 
 jobs:
-  build:
+  unit-test:
     runs-on: ubuntu-latest
     strategy:
       matrix:
         node-version: ${{ fromJson(inputs.node_version) }}
+
     steps:
       - uses: actions/checkout@v4
 
@@ -34,4 +35,4 @@ jobs:
 
       - run: npm ci
 
-      - run: npm run build
+      - run: npm test -- --watch=false
