@@ -1,4 +1,4 @@
-name: Unit Test Angular App
+name: Unit Test Angular App (Vitest)
 
 on:
   workflow_call:
@@ -8,6 +8,9 @@ on:
         type: string
         default: "['22.x']"
         description: Node.js version to use when setting up. (eg. 22.x, 20.x)
+
+permissions:
+  contents: read
 
 jobs:
   unit-test:
@@ -28,6 +31,14 @@ jobs:
       - run: npm ci
 
       - name: Run Vitest tests
-        run: npm test -- --watch=false
+        run: npm test -- --watch=false --coverage
         env:
           CI: true
+
+      - name: Upload test coverage
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: vitest-coverage-${{ matrix.node-version }}
+          path: coverage/
+          retention-days: 7

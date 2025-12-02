@@ -51,7 +51,7 @@ jobs:
         id: get-previous-version
         run: |
           PREV_PKG_VERSION=$(npm pkg get version)
-          echo "prev-pkg-ver=$PREV_PKG_VERSION" > $GITHUB_OUTPUT
+          echo "prev-pkg-ver=$PREV_PKG_VERSION" >> $GITHUB_OUTPUT
 
       - name: Semantic Release
         uses: nick-fields/retry@v2
@@ -66,4 +66,4 @@ jobs:
         id: get-version
         run: |
           PKG_VERSION=$(npm pkg get version)
-          echo "pkg-ver=$PKG_VERSION" > $GITHUB_OUTPUT
+          echo "pkg-ver=$PKG_VERSION" >> $GITHUB_OUTPUT

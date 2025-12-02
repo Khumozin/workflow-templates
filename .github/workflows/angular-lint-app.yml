@@ -9,6 +9,9 @@ on:
         default: "['22.x']"
         description: Node.js version to use when setting up. (eg. 22.x, 20.x)
 
+permissions:
+  contents: read
+
 jobs:
   lint:
     runs-on: ubuntu-latest
