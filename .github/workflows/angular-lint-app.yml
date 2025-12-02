@@ -7,7 +7,7 @@ on:
         required: true
         type: string
         default: "['22.x']"
-        description: Node.js version to use when setting up. (eg. 20.x, 18.x)
+        description: Node.js version to use when setting up. (eg. 22.x, 20.x)
 
 jobs:
   lint:
@@ -25,14 +25,9 @@ jobs:
           node-version: ${{ matrix.node-version }}
           cache: "npm"
 
-      - name: Cache Node Modules
-        uses: actions/cache@v3
-        with:
-          path: ~/.npm
-          key: ${{ runner.os }}-node-modules-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-modules-
-
       - run: npm ci
 
-      - run: npm run lint
+      - name: Run ESLint in CI mode
+        run: npm run lint
+        env:
+          CI: true
