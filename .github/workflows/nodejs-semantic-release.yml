@@ -6,8 +6,8 @@ on:
       node_version:
         required: true
         type: string
-        default: "['20.x']"
-        description: Node.js version to use when setting up. (eg. 20.x, 18.x)
+        default: "['22.x']"
+        description: Node.js version to use when setting up. (eg. 22.x, 20.x)
     outputs:
         pkg-version:
             description: "The current release version"
@@ -39,25 +39,19 @@ jobs:
           node-version: ${{ matrix.node-version }}
           cache: "npm"
 
-      - name: Cache Node Modules
-        uses: actions/cache@v3
-        with:
-          path: ~/.npm
-          key: ${{ runner.os }}-node-modules-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-modules-
-
       - name: Install Dependencies
         run: npm ci
 
       - name: Build App
         run: npm run build
+        env:
+          CI: true
 
       - name: Get Previous Release Version
         id: get-previous-version
         run: |
           PREV_PKG_VERSION=$(npm pkg get version)
-          echo "prev-pkg-ver=$PREV_PKG_VERSION" > $GITHUB_OUTPUT
+          echo "prev-pkg-ver=$PREV_PKG_VERSION" >> $GITHUB_OUTPUT
 
       - name: Semantic Release
         uses: nick-fields/retry@v2
@@ -72,4 +66,4 @@ jobs:
         id: get-version
         run: |
           PKG_VERSION=$(npm pkg get version)
-          echo "pkg-ver=$PKG_VERSION" > $GITHUB_OUTPUT
+          echo "pkg-ver=$PKG_VERSION" >> $GITHUB_OUTPUT
