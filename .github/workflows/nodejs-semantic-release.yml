@@ -6,8 +6,7 @@ on:
       node_version:
         required: true
         type: string
-        default: "['22.x']"
-        description: Node.js version to use when setting up. (eg. 22.x, 20.x)
+        description: Node.js version to use when setting up. (eg. 20.x, 18.x)
     outputs:
         pkg-version:
             description: "The current release version"
@@ -16,12 +15,13 @@ on:
                 description: "The previous release version"
                 value: ${{ jobs.semantic-release.outputs.prev-pkg-version }}
 
+concurrency:
+  group: semantic-release-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
   semantic-release:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        node-version: ${{ fromJson(inputs.node_version) }}
 
     permissions:
       contents: write
@@ -32,11 +32,13 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-      - name: Setup Node.js ${{ matrix.node-version }}
+      - name: Setup Node.js ${{ inputs.node_version }}
         uses: actions/setup-node@v4
         with:
-          node-version: ${{ matrix.node-version }}
+          node-version: ${{ inputs.node_version }}
           cache: "npm"
 
       - name: Install Dependencies
@@ -50,8 +52,8 @@ jobs:
       - name: Get Previous Release Version
         id: get-previous-version
         run: |
-          PREV_PKG_VERSION=$(npm pkg get version)
-          echo "prev-pkg-ver=$PREV_PKG_VERSION" >> $GITHUB_OUTPUT
+          PREV_PKG_VERSION=$(npm pkg get version | tr -d '"')
+          echo "prev-pkg-ver=$PREV_PKG_VERSION" >> "$GITHUB_OUTPUT"
 
       - name: Semantic Release
         uses: nick-fields/retry@v2
@@ -61,9 +63,13 @@ jobs:
           command: npx semantic-release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GIT_AUTHOR_NAME: github-actions[bot]
+          GIT_AUTHOR_EMAIL: 41898282+github-actions[bot]@users.noreply.github.com
+          GIT_COMMITTER_NAME: github-actions[bot]
+          GIT_COMMITTER_EMAIL: 41898282+github-actions[bot]@users.noreply.github.com
 
       - name: Get Updated Release Version
         id: get-version
         run: |
-          PKG_VERSION=$(npm pkg get version)
-          echo "pkg-ver=$PKG_VERSION" >> $GITHUB_OUTPUT
+          PKG_VERSION=$(npm pkg get version | tr -d '"')
+          echo "pkg-ver=$PKG_VERSION" >> "$GITHUB_OUTPUT"
