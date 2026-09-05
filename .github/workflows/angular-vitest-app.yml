@@ -1,4 +1,4 @@
-name: Unit Test Angular App
+name: Unit Test Angular App (Vitest)
 
 on:
   workflow_call:
@@ -7,7 +7,10 @@ on:
         required: true
         type: string
         default: "['22.x']"
-        description: Node.js version to use when setting up. (eg. 20.x, 18.x)
+        description: Node.js version to use when setting up. (eg. 22.x, 20.x)
+
+permissions:
+  contents: read
 
 jobs:
   unit-test:
@@ -25,14 +28,17 @@ jobs:
           node-version: ${{ matrix.node-version }}
           cache: "npm"
 
-      - name: Cache Node Modules
-        uses: actions/cache@v3
-        with:
-          path: ~/.npm
-          key: ${{ runner.os }}-node-modules-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-modules-
-
       - run: npm ci
 
-      - run: npm test -- --watch=false
+      - name: Run Vitest tests
+        run: npm test -- --watch=false --coverage
+        env:
+          CI: true
+
+      - name: Upload test coverage
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: vitest-coverage-${{ matrix.node-version }}
+          path: coverage/
+          retention-days: 7

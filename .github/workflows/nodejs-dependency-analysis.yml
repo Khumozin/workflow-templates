@@ -6,8 +6,8 @@ on:
       node_version:
         required: true
         type: string
-        default: "['20.x']"
-        description: Node.js version to use when setting up. (eg. 20.x, 18.x)
+        default: "['22.x']"
+        description: Node.js version to use when setting up. (eg. 22.x, 20.x)
     secrets:
       SNYK_TOKEN:
         required: true
@@ -29,14 +29,6 @@ jobs:
           node-version: ${{ matrix.node-version }}
           cache: "npm"
 
-      - name: Cache Node Modules
-        uses: actions/cache@v3
-        with:
-          path: ~/.npm
-          key: ${{ runner.os }}-node-modules-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-modules-
-
       - run: npm ci
 
       - name: Run Snyk to check for vulnerabilities
@@ -44,8 +36,9 @@ jobs:
         continue-on-error: true # To make sure that SARIF upload gets called
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+          CI: true
         with:
-          args: --severity-threshold=high
+          args: --severity-threshold=high --json
 
     #   - name: Run npm audit
     #     run: npm audit --audit-level=high
