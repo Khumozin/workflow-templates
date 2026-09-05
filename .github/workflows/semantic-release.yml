@@ -6,26 +6,28 @@ on:
       node_version:
         required: true
         type: string
-        default: "['22.x']"
         description: Node.js version to use when setting up. (eg. 20.x, 18.x)
+
+concurrency:
+  group: semantic-release-${{ github.ref }}
+  cancel-in-progress: false
 
 jobs:
   semantic-release:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        node-version: ${{ fromJson(inputs.node_version) }}
 
     permissions:
       contents: write
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-      - name: Setup Node.js ${{ matrix.node-version }}
+      - name: Setup Node.js ${{ inputs.node_version }}
         uses: actions/setup-node@v4
         with:
-          node-version: ${{ matrix.node-version }}
+          node-version: ${{ inputs.node_version }}
 
       - name: Install Dependencies
         run: npm install --global semantic-release@24.2.0 @semantic-release/github@11.0.1
@@ -38,3 +40,7 @@ jobs:
           command: semantic-release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GIT_AUTHOR_NAME: github-actions[bot]
+          GIT_AUTHOR_EMAIL: 41898282+github-actions[bot]@users.noreply.github.com
+          GIT_COMMITTER_NAME: github-actions[bot]
+          GIT_COMMITTER_EMAIL: 41898282+github-actions[bot]@users.noreply.github.com
