@@ -7,6 +7,10 @@ on:
         required: true
         type: string
         description: Node.js version to use when setting up. (eg. 20.x, 18.x)
+    secrets:
+      release_token:
+        required: true
+        description: Token with write access that can bypass branch protection, used for the git push/tag and GitHub release creation.
     outputs:
         pkg-version:
             description: "The current release version"
@@ -34,6 +38,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          token: ${{ secrets.release_token }}
 
       - name: Setup Node.js ${{ inputs.node_version }}
         uses: actions/setup-node@v4
@@ -62,7 +67,7 @@ jobs:
           max_attempts: 2
           command: npx semantic-release
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.release_token }}
           GIT_AUTHOR_NAME: github-actions[bot]
           GIT_AUTHOR_EMAIL: 41898282+github-actions[bot]@users.noreply.github.com
           GIT_COMMITTER_NAME: github-actions[bot]
